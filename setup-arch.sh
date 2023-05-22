@@ -39,7 +39,7 @@ choose_desktop(){
             echo "$YELLOW""No desktop would be installed""$RESET"
             desktop_name="none"
         else
-            echo "$YELLOW""You must make a choice!"
+            echo "$YELLOW""You must make a choice!""$RESET"
             desktop_name=""
             ask_desktop
         fi
@@ -88,9 +88,43 @@ choose_kernel(){
             kernel_to_install="linux-rt-lts"
             kernel_name=" Linux Realtime LTS Kernel"
         else
-            echo "$YELLOW""You must make a choice!"
+            echo "$YELLOW""You must make a choice!""$RESET"
             kernel_name=""
             ask_kernel
         fi
     done
+}
+
+uefi_ask_bootloader(){
+    echo "$GREEN""You can choose one of bootloaders:""$RESET"
+    echo "1. Grub"
+    echo "2. Systemd boot"
+    echo "$YELLOW""Which bootloader do you want to use?""$RESET"
+    read -p "$YELLOW""Input your choice number: ""$RESET" -r "BOOTLOADER_CHOOSEN"
+}
+
+uefi_choose_bootloader(){
+    while [ -z "$bootloader_installer" ]
+    do
+        if [ "$BOOTLOADER_CHOOSEN" == '1' ];then
+            pacstrap /mnt grub efibootmgr os-prober
+            bootloader_installer="./bin/install-grub-uefi.sh"
+        elif [ "$BOOTLOADER_CHOOSEN" == '2' ];then
+            bootloader_installer="./bin/install-systemd-boot.sh"
+        else
+            echo "$YELLOW""You must make a choice!""$RESET"
+            uefi_ask_bootloader
+        fi
+    done
+}
+
+install_kernel_and_bootloader(){
+    if [ -d /sys/firmware/efi/efivars ];then
+        uefi_ask_bootloader
+        uefi_choose_bootloader
+    else
+        bootloader_installer="./bin/install-grub-bios.sh"
+    fi
+    pacstrap /mnt "$kernel_to_install" "$kernel_to_install""-headers"
+    /bin/bash -c "$bootloader_installer"
 }
