@@ -3,7 +3,85 @@
 RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
 YELLOW=$(tput setaf 3)
+BLUE=$(tput setaf 4)
 RESET=$(tput sgr0)
+
+ask_root_mountpoint(){
+    echo "$GREEN""Now you should choose a partition as your root patition,""$RESET"
+    if [ -d /sys/firmware/efi/efivars ];then
+        echo "$BLUE""You have boot in UEFI mode, so choose a patition in a GPT device.""$RESET"
+    else
+        echo "$BLUE""You have boot in BIOS mode or UEFI/CSM mode, so choose a patition in a MBR device, and make sure the partition you chosen is marked as boot.""$RESET"
+    fi
+    echo "$GREEN""You can choose one of these partitions as yout root partition:""$RESET"
+    echo "$(lsblk -nr | awk '{print $1}')"
+    echo "$YELLOW""Type in your root partition(eg: sda1), you don't need to type in /dev/.""$RESET"
+    read -p "$YELLOW""Input your root partition: ""$RESET" -r "ROOT_PARTITION"
+}
+
+choose_root_mountpoint(){
+    disks_on_machine=$(lsblk -nr | awk '{print $1}')
+    check_the_root_partition=$(echo "$disks_on_machine" | grep "$ROOT_PARTITION")
+    while [ -z "$check_the_root_partition" ]; do
+        echo "$YELLOW""The root partition you typed in is not available!""$RESET"
+        ask_root_mountpoint
+    done
+    ROOT_PARTITION="/dev/""$ROOT_PARTITION"
+}
+
+ask_esp_mountpoint(){
+    echo "$YELLOW""You should choose a partition as your EFI patition:""$RESET"
+    echo "$YELLOW""Type in your EFI partition(eg: sda1), you don't need to type in /dev/.""$RESET"
+    read -p "$YELLOW""Input your EFI partition: ""$RESET" -r "ESP"
+}
+
+choose_esp_mountpoint(){
+    disks_on_machine=$(lsblk -nr | awk '{print $1}')
+    check_the_efi_partition=$(echo "$disks_on_machine" | grep "$ESP")
+    while [ -z "$check_the_efi_partition" ]; do
+        echo "$YELLOW""The root partition you typed in is not available!""$RESET"
+        ask_root_mountpoint
+    done
+    ESP="/dev/""$ESP"
+}
+
+ask_grub_bios(){
+    echo "$YELLOW""Input the device (NOT a partition) that grub bootloader will be install:""$RESET"
+    echo "$(lsblk -nr | awk '{print $1}')"
+    read -p "$YELLOW""Input the device:""$RESET" -r "DEVICE"
+}
+
+choose_grub_bios(){
+    disks_on_machine=$(lsblk -nr | awk '{print $1}')
+    check_the_bios_device=$(echo "$disks_on_machine" | grep "$DEVICE")
+    while [ -z "$check_the_bios_device" ]; do
+        echo "$YELLOW""The device you typed in is not available!""$RESET"
+        ask_grub_bios
+    done
+    DEVICE="/dev/""$DEVICE"
+}
+
+mount_mountpoints(){
+    ask_root_mountpoint
+    choose_root_mountpoint
+    if [ -d /sys/firmware/efi/efivars ];then
+        ask_esp_mountpoint
+        choose_esp_mountpoint
+    else
+        ask_grub_bios
+        choose_grub_bios
+    fi
+    read -p "$YELLOW""Input yes to format root if you want:""$RESET" -r "FORMAT_ROOT"
+    if [ "$FORMAT_ROOT" == "yes" ]; then
+        mkfs.ext4 "$ROOT_PARTITION"
+    fi
+    if [ -n "$ESP" ]; then
+        read -p "$YELLOW""Input yes to format ESP if you want:""$RESET" -r "FORMAT_ESP"
+        if [ "$FORMAT_ESP" == "yes" ];then
+            mkfs.vfat "$ESP"
+        fi
+    fi
+}
 
 ask_desktop(){
     echo "$GREEN""You can choose one of these desktops:""$RESET"
@@ -107,7 +185,6 @@ uefi_choose_bootloader(){
     while [ -z "$bootloader_installer" ]
     do
         if [ "$BOOTLOADER_CHOOSEN" == '1' ];then
-            pacstrap /mnt grub efibootmgr os-prober
             bootloader_installer="./bin/install-grub-uefi.sh"
         elif [ "$BOOTLOADER_CHOOSEN" == '2' ];then
             bootloader_installer="./bin/install-systemd-boot.sh"
@@ -118,13 +195,26 @@ uefi_choose_bootloader(){
     done
 }
 
-install_kernel_and_bootloader(){
+ask_bootloader(){
     if [ -d /sys/firmware/efi/efivars ];then
         uefi_ask_bootloader
         uefi_choose_bootloader
     else
         bootloader_installer="./bin/install-grub-bios.sh"
     fi
-    pacstrap /mnt "$kernel_to_install" "$kernel_to_install""-headers"
+}
+
+install_bases(){
+    pacstrap /mnt base base-devel linux-firmware dnsutils usbutils
+    genfstab -U /mnt | tee /mnt/etc/fstab
     /bin/bash -c "$bootloader_installer"
+}
+
+main(){
+    ask_kernel
+    choose_kernel
+    mount_mountpoints
+    ask_desktop
+    choose_desktop
+    ask_bootloader
 }
