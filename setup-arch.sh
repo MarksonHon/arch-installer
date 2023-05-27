@@ -248,6 +248,27 @@ add_sudo_user(){
     sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /mnt/etc/sudoers
 }
 
+ask_locale(){
+    while true; do
+        echo "$YELLOW""Input your locale, such as en_US, zh_CN or de_DE""$RESET"
+        read -p "$YELLOW""Input locale: ""$RESET" -r "USER_LOCALE"
+        check_locale=$(grep -E "^$USER_LOCALE" /etc/locale-gen)
+        if [ -n "$check_locale" ]; then
+            echo "$GREEN""Your locale is""$RESET ""$USER_LOCALE"
+            break
+        else
+            echo "$RED""Your locale is invaild, input again!""$RESET"
+        fi
+    done
+}
+
+setup-locale(){
+    real_locale=$(cat /mnt/etc/locale.gen | grep UTF-8 | grep "$USER_LOCALE" | sed 's|#||g')
+    sed -i "s|#$real_locale|$real_locale|" /mnt/etc/locale.gen
+    echo "LANG=$USER_LOCALE.UTF-8" >> /mnt/etc/locale.conf
+    arch-chroot /mnt/ /bin/bash -c "locale-gen"
+}
+
 main(){
     ask_kernel
     choose_kernel
@@ -256,9 +277,11 @@ main(){
     choose_desktop
     ask_bootloader
     ask_sudo_user
+    ask_locale
     install_bases
     install_bootloader
     install_desktop
     add_sudo_user
+    setup-locale
 }
 
