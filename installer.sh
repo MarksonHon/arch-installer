@@ -5,6 +5,8 @@ GREEN=$(tput setaf 2)
 YELLOW=$(tput setaf 3)
 RESET=$(tput sgr0)
 
+set -e
+
 home_path="$(pwd)"
 
 for tool in curl unzip git; do
@@ -12,11 +14,7 @@ for tool in curl unzip git; do
         tool_need="$tool"" ""$tool_need"
     fi
 done
-if ! /bin/bash -c "pacman -Sy $tool_need";then
-        echo "$RED""Use system package manager to install $tool_need failed,""$RESET"
-        echo "$RED""You should install $tool_need then try again.""$RESET"
-        exit 1
-fi
+/bin/bash -c "pacman -Sy $tool_need
 
 git clone https://github.com/MarksonHon/arch-installer/
 
