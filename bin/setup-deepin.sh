@@ -2,7 +2,7 @@
 
 set -e
 
-pacstrap /mnt deepin deepin-extra
+pacstrap /mnt deepin deepin-extra falkon
 
 systemctl enable lightdm.service
 systemctl enable NetworkManager.service

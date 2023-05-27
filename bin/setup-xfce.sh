@@ -2,7 +2,7 @@
 
 set -e
 
-pacstrap /mnt lightdm xfce4 xfce4-goodies
+pacstrap /mnt lightdm xfce4 xfce4-goodies falkon
 
 systemctl enable lightdm.service
 systemctl enable NetworkManager.service

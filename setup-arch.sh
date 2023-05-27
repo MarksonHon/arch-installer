@@ -81,6 +81,11 @@ mount_mountpoints(){
             mkfs.vfat "$ESP"
         fi
     fi
+    mount "$ROOT_PARTITION" /mnt
+    if [ -n "$ESP" ]; then
+        mkdir /mnt/efi
+        mount "$ESP" /mnt/efi
+    fi
 }
 
 ask_desktop(){
@@ -204,10 +209,43 @@ ask_bootloader(){
     fi
 }
 
+install_bootloader(){
+    arch-chroot /mnt /bin/bash -c $bootloader_installer
+}
+
 install_bases(){
     pacstrap /mnt base base-devel linux-firmware dnsutils usbutils
     genfstab -U /mnt | tee /mnt/etc/fstab
-    /bin/bash -c "$bootloader_installer"
+}
+
+ask_sudo_user(){
+    while true; do
+        echo "$YELLOW""Now you should add user with sudo access,""$RESET"
+        read -p "$YELLOW""Input your username: ""$RESET" -r "USERNAME"
+        check_username=$(grep -E "^$USERNAME" /etc/passwd)
+        if [ -z "$check_username" ]; then
+            echo "$GREEN""Your username is""$RESET ""$USERNAME"
+            break
+        else
+            echo "$RED""Your username is already exist, or you have not input your username!""$RESET"
+        fi
+    done
+    while true; do
+        read -p "$YELLOW""Input your password: ""$RESET" -s -r "PASSWORD"; printf "\n"
+        read -p "$YELLOW""Input your password again: ""$RESET" -s -r "PASSWORD_AGAIN"; printf "\n"
+        if [ "$PASSWORD" == "$PASSWORD_AGAIN" ]; then
+            echo "$GREEN""Set password successfully""$RESET"
+            break
+        else
+            echo "$RED""The password you input firstly is NOT match the password you input secondly!""$RESET"
+        fi
+    done
+    password_to_add=$(perl -e 'print crypt($ARGV[0], "password")' "$PASSWORD")
+}
+
+add_sudo_user(){
+    arch-chroot /mnt /bin/bash -c "useradd -G wheel -m \"$USERNAME\" -p \"$password_to_add\""
+    sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /mnt/etc/sudoers
 }
 
 main(){
@@ -217,4 +255,10 @@ main(){
     ask_desktop
     choose_desktop
     ask_bootloader
+    ask_sudo_user
+    install_bases
+    install_bootloader
+    install_desktop
+    add_sudo_user
 }
+
