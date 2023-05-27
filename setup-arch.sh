@@ -252,7 +252,7 @@ ask_locale(){
     while true; do
         echo "$YELLOW""Input your locale, such as en_US, zh_CN or de_DE""$RESET"
         read -p "$YELLOW""Input locale: ""$RESET" -r "USER_LOCALE"
-        check_locale=$(grep -E "^$USER_LOCALE" /etc/locale-gen)
+        check_locale=$(cat /etc/locale.gen | grep "$USER_LOCALE")
         if [ -n "$check_locale" ]; then
             echo "$GREEN""Your locale is""$RESET ""$USER_LOCALE"
             break
@@ -284,4 +284,6 @@ main(){
     add_sudo_user
     setup-locale
 }
+
+main "$@"
 
