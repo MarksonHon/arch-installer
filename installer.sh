@@ -20,7 +20,7 @@ download_installer(){
     unzip arch-installer.zip; rm arch-installer.zip*; chmod +x ./arch-installer/*sh; chmod +x ./arch-installer/bin/*sh
 }
 
-for tool in curl unzip; do
+for tool in curl unzip git; do
     if ! command -v $tool> /dev/null 2>&1; then
         tool_need="$tool"" ""$tool_need"
     fi
