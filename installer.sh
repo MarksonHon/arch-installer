@@ -5,8 +5,6 @@ GREEN=$(tput setaf 2)
 YELLOW=$(tput setaf 3)
 RESET=$(tput sgr0)
 
-set -ex
-
 home_path="$(pwd)"
 
 for tool in curl unzip git; do
