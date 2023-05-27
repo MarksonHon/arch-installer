@@ -4,6 +4,6 @@ set -e
 
 pacstrap /mnt gnome gnome-terminal gnome-tweaks gnome-notes
 
-systemctl enable gdm.service
-systemctl enable NetworkManager.service
-systemctl enable bluetooth.service
+arch-chroot /mnt /bin/bash -c "systemctl enable gdm.service"
+arch-chroot /mnt /bin/bash -c "systemctl enable NetworkManager.service"
+arch-chroot /mnt /bin/bash -c "systemctl enable bluetooth.service"

@@ -4,6 +4,6 @@ set -e
 
 pacstrap /mnt lightdm xfce4 xfce4-goodies falkon
 
-systemctl enable lightdm.service
-systemctl enable NetworkManager.service
-systemctl enable bluetooth.service
+arch-chroot /mnt /bin/bash -c "systemctl enable lightdm.service"
+arch-chroot /mnt /bin/bash -c "systemctl enable NetworkManager.service"
+arch-chroot /mnt /bin/bash -c "systemctl enable bluetooth.service"

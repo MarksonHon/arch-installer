@@ -4,6 +4,6 @@ set -e
 
 pacstrap /mnt plasma-meta plasma-wayland-session falkon vlc pipewire-pulse pipewire-jack plasma ksystemlog kcolorchooser colord-kde gwenview dolphin kcalc spectacle konsole
 
-systemctl enable sddm.service
-systemctl enable NetworkManager.service
-systemctl enable bluetooth.service
+arch-chroot /mnt /bin/bash -c "systemctl enable sddm.service"
+arch-chroot /mnt /bin/bash -c "systemctl enable NetworkManager.service"
+arch-chroot /mnt /bin/bash -c "systemctl enable bluetooth.service"
