@@ -6,6 +6,8 @@ YELLOW=$(tput setaf 3)
 BLUE=$(tput setaf 4)
 RESET=$(tput sgr0)
 
+home_path="$(pwd)"
+
 ask_root_mountpoint(){
     echo "$GREEN""Now you should choose a partition as your root patition,""$RESET"
     if [ -d /sys/firmware/efi/efivars ];then
