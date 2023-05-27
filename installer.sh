@@ -5,7 +5,7 @@ GREEN=$(tput setaf 2)
 YELLOW=$(tput setaf 3)
 RESET=$(tput sgr0)
 
-set -e
+set -ex
 
 home_path="$(pwd)"
 
@@ -14,10 +14,10 @@ for tool in curl unzip git; do
         tool_need="$tool"" ""$tool_need"
     fi
 done
-/bin/bash -c "pacman -Sy $tool_need
+/bin/bash -c "pacman -Sy $tool_need"
 
 git clone https://github.com/MarksonHon/arch-installer/
 
 echo "$YELLOW""The path of installer is $home_path""$RESET"
 
-./arch-installer/bin/setup-arch.sh
+./arch-installer/setup-arch.sh
