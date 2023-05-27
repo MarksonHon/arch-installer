@@ -20,8 +20,8 @@ ask_root_mountpoint(){
 }
 
 choose_root_mountpoint(){
-    disks_on_machine=$(lsblk -nr | awk '{print $1}')
-    check_the_root_partition=$(echo "$disks_on_machine" | grep "$ROOT_PARTITION")
+    disks_on_machine="$(lsblk -nr | awk '{print $1}')"
+    check_the_root_partition="$(echo "$disks_on_machine" | grep "$ROOT_PARTITION")"
     while [ -z "$check_the_root_partition" ]; do
         echo "$YELLOW""The root partition you typed in is not available!""$RESET"
         ask_root_mountpoint
@@ -36,8 +36,8 @@ ask_esp_mountpoint(){
 }
 
 choose_esp_mountpoint(){
-    disks_on_machine=$(lsblk -nr | awk '{print $1}')
-    check_the_efi_partition=$(echo "$disks_on_machine" | grep "$ESP")
+    disks_on_machine="$(lsblk -nr | awk '{print $1}')"
+    check_the_efi_partition="$(echo "$disks_on_machine" | grep "$ESP")"
     while [ -z "$check_the_efi_partition" ]; do
         echo "$YELLOW""The root partition you typed in is not available!""$RESET"
         ask_root_mountpoint
@@ -52,8 +52,8 @@ ask_grub_bios(){
 }
 
 choose_grub_bios(){
-    disks_on_machine=$(lsblk -nr | awk '{print $1}')
-    check_the_bios_device=$(echo "$disks_on_machine" | grep "$DEVICE")
+    disks_on_machine="$(lsblk -nr | awk '{print $1}')"
+    check_the_bios_device="$(echo "$disks_on_machine" | grep "$DEVICE")"
     while [ -z "$check_the_bios_device" ]; do
         echo "$YELLOW""The device you typed in is not available!""$RESET"
         ask_grub_bios
