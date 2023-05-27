@@ -141,7 +141,7 @@ install_desktop(){
 
 ask_kernel(){
     echo "$GREEN""You can choose one of these Linux kernels:""$RESET"
-    echo "1. Linux Kernel(the default kernel)(linux)"
+    echo "1. Linux Kernel (the default kernel)(linux)"
     echo "2. Linux LTS Kernel(linux-lts)"
     echo "3. Linux Zen Kernel(linux-zen)"
     echo "4. Linux Hardened Kernel(linux-hardened)"
@@ -212,7 +212,7 @@ ask_bootloader(){
 }
 
 install_bootloader(){
-    /bin/bash -c $bootloader_installer
+    $bootloader_installer
 }
 
 install_bases(){
