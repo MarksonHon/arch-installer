@@ -8,11 +8,11 @@ RESET=$(tput sgr0)
 home_path="$(pwd)"
 
 download_installer(){
-    echo "$GREEN""We will download the installer twice for checking sha256""$RESET"
+    echo "$GREEN""We will download the installer twice for checking sha256...""$RESET"
     curl -L https://github.com/MarksonHon/arch-installer/archive/refs/heads/master.zip -o arch-installer.zip
     curl -L https://github.com/MarksonHon/arch-installer/archive/refs/heads/master.zip -o arch-installer.zip.2
-    sha256_download_once="$(sha256sum ./arch-installer.zip)"
-    sha256_download_twice="$(sha256sum ./arch-installer.zip.2)"
+    sha256_download_once="$(sha256sum ./arch-installer.zip | awk -F ' ' '{print $1}')"
+    sha256_download_twice="$(sha256sum ./arch-installer.zip.2 | awk -F ' ' '{print $1}')"
     if [ "$sha256_download_once" != "$sha256_download_twice" ];then
         echo "$RED""Failed to pass sha256 check, please try again!""$RESET"
         return 1
@@ -25,7 +25,7 @@ for tool in curl unzip git; do
         tool_need="$tool"" ""$tool_need"
     fi
 done
-if ! /bin/bash -c "pacman -Sy \"$tool_need\"";then
+if ! /bin/bash -c "pacman -Sy $tool_need";then
         echo "$RED""Use system package manager to install $tool_need failed,""$RESET"
         echo "$RED""You should install $tool_need then try again.""$RESET"
         exit 1
