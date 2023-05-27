@@ -212,7 +212,7 @@ ask_bootloader(){
 }
 
 install_bootloader(){
-    arch-chroot /mnt /bin/bash -c $bootloader_installer
+    /bin/bash -c $bootloader_installer
 }
 
 install_bases(){
