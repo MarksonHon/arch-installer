@@ -25,7 +25,7 @@ for tool in curl unzip git; do
         tool_need="$tool"" ""$tool_need"
     fi
 done
-if ! pacman -Sy "$tool_need";then
+if ! /bin/bash -c "pacman -Sy \"$tool_need\"";then
         echo "$RED""Use system package manager to install $tool_need failed,""$RESET"
         echo "$RED""You should install $tool_need then try again.""$RESET"
         exit 1
