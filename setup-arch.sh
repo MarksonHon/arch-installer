@@ -192,9 +192,9 @@ uefi_choose_bootloader(){
     while [ -z "$bootloader_installer" ]
     do
         if [ "$BOOTLOADER_CHOOSEN" == '1' ];then
-            bootloader_installer="./bin/install-grub-uefi.sh"
+            bootloader_installer="grub-uefi"
         elif [ "$BOOTLOADER_CHOOSEN" == '2' ];then
-            bootloader_installer="./bin/install-systemd-boot.sh"
+            bootloader_installer="systemd-boot"
         else
             echo "$YELLOW""You must make a choice!""$RESET"
             uefi_ask_bootloader
@@ -207,12 +207,18 @@ ask_bootloader(){
         uefi_ask_bootloader
         uefi_choose_bootloader
     else
-        bootloader_installer="./bin/install-grub-bios.sh"
+        bootloader_installer="grub-bios"
     fi
 }
 
 install_bootloader(){
-    $bootloader_installer
+    if [ "$bootloader_installer" == 'grub-uefi' ];then
+        install_grub_uefi
+    elif [ "$bootloader_installer" == 'grub-bios' ];then
+        install_grub_bios
+    elif [ "$bootloader_installer" == 'systemd-boot' ];then
+        install_systemd_boot
+    fi
 }
 
 install_bases(){
@@ -271,6 +277,36 @@ setup-locale(){
     arch-chroot /mnt/ /bin/bash -c "locale-gen"
 }
 
+install_grub_bios(){
+    pacstrap /mnt grub os-prober
+    arch-chroot /mnt /bin/bash -c "grub-install --target=i386-pc $DEVICE"
+    pacstrap /mnt mkinitcpio "$kernel_to_install" "$kernel_to_install""-headers"
+    arch-chroot /mnt /bin/bash -c "echo 'GRUB_DISABLE_OS_PROBER=false' >> /etc/default/grub"
+    arch-chroot /mnt /bin/bash -c "grub-mkconfig -o /boot/grub/grub.cfg"
+}
+
+install_grub_uefi(){
+    pacstrap /mnt grub efibootmgr os-prober
+    arch-chroot /mnt /bin/bash -c "grub-install --target=x86_64-efi --bootloader-id='Arch Linux' --efi-directory=$ESP"
+    pacstrap /mnt mkinitcpio "$kernel_to_install" "$kernel_to_install""-headers"
+    arch-chroot /mnt /bin/bash -c "echo 'GRUB_DISABLE_OS_PROBER=false' >> /etc/default/grub"
+    arch-chroot /mnt /bin/bash -c "grub-mkconfig -o /boot/grub/grub.cfg"
+}
+
+install_systemd_boot(){
+    arch-chroot /mnt /bin/bash -c "bootctl install --esp-path=/efi"
+    root_partition_part_uuid="$(lsblk "$ROOT_PARTITION" -no PARTUUID)"
+    echo "root=PARTUUID=$root_partition_part_uuid rw rootfstype=ext4" > /mnt/etc/kernel/cmdline
+    mkdir -p /mnt/etc/mkinitcpio.d/
+    cat "./customs/systemd-boot-uki-kernel.conf" | sed "s|linux|$kernel_to_install|g" | tee "/mnt/etc/mkinitcpio.d/""$kernel_to_install"".preset.pacsave"
+    pacstrap /mnt mkinitcpio "$kernel_to_install" "$kernel_to_install""-headers"
+
+}
+
+enable_timesync(){
+    arch-chroot /mnt /bin/bash -c "systemctl enable systemd-timesyncd.service"
+}
+
 main(){
     ask_kernel
     choose_kernel
@@ -285,6 +321,7 @@ main(){
     install_desktop
     add_sudo_user
     setup-locale
+    enable_timesync
 }
 
 main "$@"
