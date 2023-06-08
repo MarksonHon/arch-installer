@@ -3,7 +3,6 @@
 RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
 YELLOW=$(tput setaf 3)
-BLUE=$(tput setaf 4)
 RESET=$(tput sgr0)
 
 for tool in curl unzip git; do
@@ -11,7 +10,10 @@ for tool in curl unzip git; do
         tool_need="$tool"" ""$tool_need"
     fi
 done
-/bin/bash -c "pacman -Sy $tool_need"
+if ! (/bin/bash -c "pacman -Sy $tool_need");then
+    echo "$RED""ERROR: Failed to install $tool_need, check your network settings or permission then try again!""$RESET"
+    exit 1
+fi
 
 echo "$GREEN""-----------------------------------------------------------""$RESET"
 echo "$GREEN""-----------------------------------------------------------""$RESET"
@@ -21,7 +23,7 @@ echo "and you have backup files before installing."
 echo "$GREEN""-----------------------------------------------------------""$RESET"
 echo "$GREEN""-----------------------------------------------------------""$RESET"
 
-read -p "$YELLOW""Do you want to continue? Type \"yes\" to continue. ""$RESET" -r "RUOK"
+read -p "$YELLOW""Do you want to continue? Type \"yes\" to continue: ""$RESET" -r "RUOK"
 
 if [ "$RUOK" == "yes" ]; then
     git clone https://github.com/MarksonHon/arch-installer/
