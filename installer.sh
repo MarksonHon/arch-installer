@@ -15,13 +15,13 @@ if ! (/bin/bash -c "pacman -Sy $tool_need");then
     exit 1
 fi
 
-echo "$GREEN""-----------------------------------------------------------""$RESET"
-echo "$GREEN""-----------------------------------------------------------""$RESET"
+echo "$GREEN""-----------------------------------------------------------------------------""$RESET"
+echo "$GREEN""-----------------------------------------------------------------------------""$RESET"
 echo "Now you can install the Arch Linux!"
 echo "Before installing, make sure you have the partition OK with fdisk or cfdisk,"
 echo "and you have backup files before installing."
-echo "$GREEN""-----------------------------------------------------------""$RESET"
-echo "$GREEN""-----------------------------------------------------------""$RESET"
+echo "$GREEN""-----------------------------------------------------------------------------""$RESET"
+echo "$GREEN""-----------------------------------------------------------------------------""$RESET"
 
 read -p "$YELLOW""Do you want to continue? Type \"yes\" to continue: ""$RESET" -r "RUOK"
 
