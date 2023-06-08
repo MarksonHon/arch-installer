@@ -21,8 +21,10 @@ echo "and you have backup files before installing."
 echo "$GREEN""-----------------------------------------------------------""$RESET"
 echo "$GREEN""-----------------------------------------------------------""$RESET"
 
-git clone https://github.com/MarksonHon/arch-installer/
+read -p "$YELLOW""Do you want to continue? Type \"yes\" to continue. ""$RESET" -r "RUOK"
 
-cd ./arch-installer/ || exit 1
-
-./setup-arch.sh
+if [ "$RUOK" == "yes" ]; then
+    git clone https://github.com/MarksonHon/arch-installer/
+    cd ./arch-installer/ || exit 1
+    ./setup-arch.sh
+fi
