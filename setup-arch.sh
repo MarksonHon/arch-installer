@@ -8,6 +8,14 @@ RESET=$(tput sgr0)
 
 home_path="$(pwd)"
 
+delect_ucode(){
+    if [ -n "$(cat /proc/cpuinfo | grep Intel)" ];then
+        ucode="intel-ucode"
+    elif [ -n "$(cat /proc/cpuinfo | grep AMD)" ];then
+        ucode="amd-ucode"
+    fi
+}
+
 ask_root_mountpoint(){
     echo "$GREEN""Now you should choose a partition as your root patition,""$RESET"
     if [ -d /sys/firmware/efi/efivars ];then
@@ -15,17 +23,13 @@ ask_root_mountpoint(){
     else
         echo "$BLUE""You have boot in BIOS mode or UEFI/CSM mode, so choose a patition in a MBR device, and make sure the partition you chosen is marked as boot.""$RESET"
     fi
-    echo "$GREEN""You can choose one of these partitions as yout root partition:""$RESET"
-    echo "$(lsblk -nr | awk '{print $1}')"
     echo "$YELLOW""Type in your root partition(eg: sda1), you don't need to type in /dev/.""$RESET"
     read -p "$YELLOW""Input your root partition: ""$RESET" -r "ROOT_PARTITION"
 }
 
 choose_root_mountpoint(){
-    disks_on_machine="$(lsblk -nr | awk '{print $1}')"
-    check_the_root_partition="$(echo "$disks_on_machine" | grep "$ROOT_PARTITION")"
-    while [ -z "$check_the_root_partition" ]; do
-        echo "$YELLOW""The root partition you typed in is not available!""$RESET"
+    while ! [ -b /dev/"$ROOT_PARTITION" ]; do
+        echo "$RED""The root partition you typed in is not available!""$RESET"
         ask_root_mountpoint
     done
     ROOT_PARTITION="/dev/""$ROOT_PARTITION"
@@ -38,25 +42,47 @@ ask_esp_mountpoint(){
 }
 
 choose_esp_mountpoint(){
-    disks_on_machine="$(lsblk -nr | awk '{print $1}')"
-    check_the_efi_partition="$(echo "$disks_on_machine" | grep "$ESP")"
-    while [ -z "$check_the_efi_partition" ]; do
-        echo "$YELLOW""The root partition you typed in is not available!""$RESET"
+    while ! [ -b "$$ESP" ]; do
+        echo "$RED""The EFI partition you typed in is not available!""$RESET"
         ask_root_mountpoint
     done
     ESP="/dev/""$ESP"
 }
 
+ask_other_mountpoints(){
+    echo "$YELLOW""You can choose other partitions as your mountpoints, leave it black if you don't need other partition.""$RESET"
+    echo "$YELLOW""Type in your partition(eg: sda1), you don't need to type in /dev/.""$RESET"
+    read -p "$YELLOW""Input your partition: ""$RESET" -r "PARTITION_OTHER"
+    if [ -n "$PARTITION_OTHER" ];then
+        echo "$YELLOW""Type in your mountpoint(eg: /boot, /var), you don't need to type in /mnt.""$RESET"
+        read -p "$YELLOW""Input your mountpoint: ""$RESET" -r "MOUNTPOINT_OTHER"
+    fi
+}
+
+mount_other_mountpoints(){
+    ask_other_mountpoints
+    while [ -n "$PARTITION_OTHER" ]; do
+        if [ -b /dev/"$PARTITION_OTHER" ];then
+            mkdir -p /mnt"$MOUNTPOINT_OTHER"
+            read -p "$YELLOW""Input yes to format the partition if you want:""$RESET" -r "FORMAT_OTHER"
+            if [ "$FORMAT_OTHER" == "yes" ];then
+                mkfs.ext4 /dev/"$PARTITION_OTHER"
+            fi
+            mount /dev/"$PARTITION_OTHER" /mnt"$MOUNTPOINT_OTHER"
+        else
+            echo "$RED""The partition you typed in is not available!""$RESET"
+        fi
+    ask_other_mountpoints
+    done
+}
+
 ask_grub_bios(){
     echo "$YELLOW""Input the device (NOT a partition) that grub bootloader will be install:""$RESET"
-    echo "$(lsblk -nr | awk '{print $1}')"
     read -p "$YELLOW""Input the device:""$RESET" -r "DEVICE"
 }
 
 choose_grub_bios(){
-    disks_on_machine="$(lsblk -nr | awk '{print $1}')"
-    check_the_bios_device="$(echo "$disks_on_machine" | grep "$DEVICE")"
-    while [ -z "$check_the_bios_device" ]; do
+    while ! [ -b /dev/"$DEVICE" ]; do
         echo "$YELLOW""The device you typed in is not available!""$RESET"
         ask_grub_bios
     done
@@ -222,7 +248,7 @@ install_bootloader(){
 }
 
 install_bases(){
-    pacstrap /mnt base base-devel linux-firmware dnsutils usbutils
+    pacstrap /mnt base base-devel linux-firmware dnsutils usbutils $ucode
     genfstab -U /mnt | tee /mnt/etc/fstab
 }
 
@@ -308,9 +334,11 @@ enable_timesync(){
 }
 
 main(){
+    delect_ucode
     ask_kernel
     choose_kernel
     mount_mountpoints
+    mount_other_mountpoints
     ask_desktop
     choose_desktop
     ask_bootloader
@@ -325,4 +353,3 @@ main(){
 }
 
 main "$@"
-
