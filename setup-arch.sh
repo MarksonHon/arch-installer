@@ -8,7 +8,7 @@ RESET=$(tput sgr0)
 
 home_path="$(pwd)"
 
-delect_ucode(){
+choose_ucode(){
     if [ -n "$(cat /proc/cpuinfo | grep Intel)" ];then
         ucode="intel-ucode"
     elif [ -n "$(cat /proc/cpuinfo | grep AMD)" ];then
@@ -158,10 +158,19 @@ choose_desktop(){
 }
 
 install_desktop(){
-    if ! /bin/bash -c "$desktop_installer";then
-        echo "$RED""Failed to install $desktop_name!""$RESET"
-        exit 1
-    fi
+    while true; do
+        if ! /bin/bash -c "$desktop_installer";then
+            echo "$RED""Failed to install $desktop_name!""$RESET"
+            echo "$YELLOW""Do you want to try again?""$RESET"
+        else
+            echo "$GREEN""$desktop_name installed successfully!""$RESET"
+            break
+        fi
+        read -p "$YELLOW""Input yes / leave blank to try again, no to skip: ""$RESET" -r "TRY_AGAIN"
+        if [ "$TRY_AGAIN" == "no" ];then
+            break
+        fi
+    done
 }
 
 
@@ -284,7 +293,7 @@ add_sudo_user(){
 
 ask_locale(){
     while true; do
-        echo "$YELLOW""Input your locale, such as en_US, zh_CN or de_DE""$RESET"
+        echo "$YELLOW""Input your locale, such as en_US, zh_CN or de_DE.""$RESET"
         read -p "$YELLOW""Input locale: ""$RESET" -r "USER_LOCALE"
         check_locale=$(cat /etc/locale.gen | grep "$USER_LOCALE")
         if [ -n "$check_locale" ]; then
@@ -296,7 +305,7 @@ ask_locale(){
     done
 }
 
-setup-locale(){
+setup_locale(){
     real_locale=$(cat /mnt/etc/locale.gen | grep UTF-8 | grep "$USER_LOCALE" | sed 's|#||g')
     sed -i "s|#$real_locale|$real_locale|" /mnt/etc/locale.gen
     echo "LANG=$USER_LOCALE.UTF-8" >> /mnt/etc/locale.conf
@@ -334,7 +343,7 @@ enable_timesync(){
 }
 
 main(){
-    delect_ucode
+    choose_ucode
     ask_kernel
     choose_kernel
     mount_mountpoints
@@ -348,7 +357,7 @@ main(){
     install_bootloader
     install_desktop
     add_sudo_user
-    setup-locale
+    setup_locale
     enable_timesync
 }
 
