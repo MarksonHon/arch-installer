@@ -42,7 +42,7 @@ ask_esp_mountpoint(){
 }
 
 choose_esp_mountpoint(){
-    while ! [ -b "$$ESP" ]; do
+    while ! [ -b /dev/"$ESP" ]; do
         echo "$RED""The EFI partition you typed in is not available!""$RESET"
         ask_root_mountpoint
     done
