@@ -39,3 +39,7 @@ if [ "$RUOK" == "yes" ]; then
     cd ./arch-installer/ || exit 1
     ./setup-arch.sh
 fi
+
+if [ -d arch-installer ]; then
+    rm -rf arch-installer
+fi
