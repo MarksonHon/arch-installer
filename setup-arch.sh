@@ -263,14 +263,18 @@ install_bases(){
 
 ask_sudo_user(){
     while true; do
-        echo "$YELLOW""Now you should add user with sudo access,""$RESET"
+        echo "$YELLOW""Now you should add user with sudo access, an username should always be lowercase:""$RESET"
         read -p "$YELLOW""Input your username: ""$RESET" -r "USERNAME"
         check_username=$(grep -E "^$USERNAME" /etc/passwd)
-        if [ -z "$check_username" ]; then
-            echo "$GREEN""Your username is""$RESET ""$USERNAME"
-            break
+        if echo "$USERNAME" | grep -q "^[a-z]*$"; then
+            if [ -z "$check_username" ]; then
+                echo "$GREEN""Your username is""$RESET ""$USERNAME"
+                break
+            else
+                echo "$RED""Your username is already exist, or you have not input your username!""$RESET"
+            fi
         else
-            echo "$RED""Your username is already exist, or you have not input your username!""$RESET"
+            echo "$RED""Username should always be lowercase, input again!""$RESET"
         fi
     done
     while true; do
