@@ -257,7 +257,7 @@ install_bootloader(){
 }
 
 install_bases(){
-    pacstrap /mnt base base-devel linux-firmware dnsutils usbutils $ucode
+    pacstrap -k /mnt base base-devel linux-firmware dnsutils usbutils $ucode
     genfstab -U /mnt | tee /mnt/etc/fstab
 }
 
@@ -312,6 +312,24 @@ setup_locale(){
     arch-chroot /mnt/ /bin/bash -c "locale-gen"
 }
 
+ask_timezone(){
+    while true; do
+        echo "$YELLOW""Input your timezone, such as Asia/Shanghai, America/New_York.""$RESET"
+        read -p "$YELLOW""Input timezone: ""$RESET" -r "USER_TIMEZONE"
+        if [ -f /usr/share/zoneinfo/"$USER_TIMEZONE" ];then
+            echo "$GREEN""Your timezone is""$RESET ""$USER_TIMEZONE"
+            break
+        else
+            echo "$RED""Your timezone is invaild, input again!""$RESET"
+        fi
+    done
+}
+
+setup_timezone(){
+    ln -sf /mnt/usr/share/zoneinfo/"$USER_TIMEZONE" /mnt/etc/localetime
+    arch-chroot /mnt/ /bin/bash -c "hwclock --systohc"
+}
+
 install_grub_bios(){
     pacstrap /mnt grub os-prober
     arch-chroot /mnt /bin/bash -c "grub-install --target=i386-pc $DEVICE"
@@ -353,11 +371,13 @@ main(){
     ask_bootloader
     ask_sudo_user
     ask_locale
+    ask_timezone
     install_bases
     install_bootloader
     install_desktop
     add_sudo_user
     setup_locale
+    setup_timezone
     enable_timesync
 }
 
