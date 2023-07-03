@@ -6,8 +6,6 @@ YELLOW=$(tput setaf 3)
 BLUE=$(tput setaf 4)
 RESET=$(tput sgr0)
 
-home_path="$(pwd)"
-
 choose_ucode(){
     if [ -n "$(cat /proc/cpuinfo | grep Intel)" ];then
         ucode="intel-ucode"
@@ -287,11 +285,11 @@ ask_sudo_user(){
             echo "$RED""The password you input firstly is NOT match the password you input secondly!""$RESET"
         fi
     done
-    password_to_add=$(perl -e 'print crypt($ARGV[0], "password")' "$PASSWORD")
 }
 
 add_sudo_user(){
-    arch-chroot /mnt /bin/bash -c "useradd -G wheel -m \"$USERNAME\" -p \"$password_to_add\""
+    arch-chroot /mnt /bin/bash -c "useradd -m -G wheel -s /bin/bash $USERNAME"
+    arch-chroot /mnt /bin/bash -c "echo $USERNAME:$PASSWORD | chpasswd"
     sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /mnt/etc/sudoers
 }
 
