@@ -156,19 +156,21 @@ choose_desktop(){
 }
 
 install_desktop(){
-    while true; do
-        if ! /bin/bash -c "$desktop_installer";then
-            echo "$RED""Failed to install $desktop_name!""$RESET"
-            echo "$YELLOW""Do you want to try again?""$RESET"
-        else
-            echo "$GREEN""$desktop_name installed successfully!""$RESET"
-            break
-        fi
-        read -p "$YELLOW""Input yes / leave blank to try again, no to skip: ""$RESET" -r "TRY_AGAIN"
-        if [ "$TRY_AGAIN" == "no" ];then
-            break
-        fi
-    done
+    if [ -n "$desktop_installer" ];then
+        while true; do
+            if ! /bin/bash -c "$desktop_installer";then
+                echo "$RED""Failed to install $desktop_name!""$RESET"
+                echo "$YELLOW""Do you want to try again?""$RESET"
+            else
+                echo "$GREEN""$desktop_name installed successfully!""$RESET"
+                break
+            fi
+            read -p "$YELLOW""Input yes / leave blank to try again, no to skip: ""$RESET" -r "TRY_AGAIN"
+            if [ "$TRY_AGAIN" == "no" ];then
+                break
+            fi
+        done
+    fi
 }
 
 
