@@ -7,3 +7,5 @@ pacstrap /mnt plasma-meta kde-system-meta kde-graphics-meta kde-utilities-meta p
 arch-chroot /mnt /bin/bash -c "systemctl enable sddm.service"
 arch-chroot /mnt /bin/bash -c "systemctl enable NetworkManager.service"
 arch-chroot /mnt /bin/bash -c "systemctl enable bluetooth.service"
+
+cp ./customs/wayland.sh /mnt/etc/profile.d/wayland.sh

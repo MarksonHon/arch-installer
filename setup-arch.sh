@@ -257,7 +257,7 @@ install_bootloader(){
 }
 
 install_bases(){
-    pacstrap -k /mnt base base-devel linux-firmware dnsutils usbutils $ucode
+    pacstrap -k /mnt base base-devel linux-firmware dnsutils usbutils $ucode zsh unrar p2zip unzip
     genfstab -U /mnt | tee /mnt/etc/fstab
 }
 
@@ -290,7 +290,7 @@ ask_sudo_user(){
 }
 
 add_sudo_user(){
-    arch-chroot /mnt /bin/bash -c "useradd -m -G wheel -s /bin/bash $USERNAME"
+    arch-chroot /mnt /bin/bash -c "useradd -m -G wheel -s /bin/zsh $USERNAME"
     arch-chroot /mnt /bin/bash -c "echo $USERNAME:$PASSWORD | chpasswd"
     sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /mnt/etc/sudoers
 }
@@ -364,6 +364,19 @@ enable_timesync(){
     arch-chroot /mnt /bin/bash -c "systemctl enable systemd-timesyncd.service"
 }
 
+setup_zsh()(
+    bash -c ./bin/setup-easy-zsh.sh
+    echo "$BLUE""paru has been installed as your AUR helper.""$RESET"
+    echo "$BLUE""pkgfile has been installed as your package command search tool.""$RESET"
+    echo "$BLUE""easy-zsh-config has been installed as your zsh config.""$RESET"
+    echo "$BLUE""oh-my-posh has been installed as your zsh theme.""$RESET"
+    echo "$BLUE""zsh-autosuggestions has been installed as your zsh plugin.""$RESET"
+    echo "$BLUE""zsh-syntax-highlighting has been installed as your zsh plugin.""$RESET"
+    echo "$BLUE""zsh-completions has been installed as your zsh plugin.""$RESET"
+    echo "$BLUE""zsh-history-substring-search has been installed as your zsh plugin.""$RESET"
+    echo "$BLUE""use \"paru -Syu\" to update AUR packages.""$RESET"
+)
+
 main(){
     choose_ucode
     ask_kernel
@@ -383,6 +396,7 @@ main(){
     setup_locale
     setup_timezone
     enable_timesync
+    setup_zsh
 }
 
 main "$@"
