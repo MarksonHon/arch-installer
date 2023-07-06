@@ -257,7 +257,8 @@ install_bootloader(){
 }
 
 install_bases(){
-    pacstrap -k /mnt base base-devel linux-firmware dnsutils usbutils $ucode zsh unrar p2zip unzip
+    pacstrap -k /mnt base base-devel linux-firmware dnsutils usbutils libva-utils "$ucode" zsh unrar p2zip unzip
+    pacstrap /mnt libva-mesa-driver intel-media-driver libva-intel-driver vulkan-intel vulkan-radeon vulkan-mesa-layers
     genfstab -U /mnt | tee /mnt/etc/fstab
 }
 
