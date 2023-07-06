@@ -2,8 +2,8 @@
 
 # If a Xwayland app wants to open a URL via xdg-open, it will call this
 # script, which will then open the URL in the default Wayland browser
-# without GDK_BACKEND environment variable set, or browser might be
-# opened in Xwayland.
+# without GDK_BACKEND environment variable set, or browser that can run
+# under wayland might be opened in Xwayland.
 
 unset GDK_BACKEND
 /usr/bin/xdg-open "$@"
