@@ -11,7 +11,7 @@ for tool in curl unzip git; do
     fi
 done
 if [ -n "$tool_need" ]; then
-    if ! (/bin/bash -c "pacman -Sy $tool_need");then
+    if ! (/bin/bash -c "pacman -Sy $tool_need" --noconfirm);then
         echo "$RED""ERROR: Failed to install $tool_need, check your network settings or permission then try again!""$RESET"
         exit 1
     fi
