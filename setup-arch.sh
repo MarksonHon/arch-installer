@@ -3,7 +3,7 @@
 RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
 YELLOW=$(tput setaf 3)
-BLUE=$(tput setaf 4)
+BROWN=$(tput setaf 5)
 RESET=$(tput sgr0)
 
 choose_ucode(){
@@ -17,9 +17,9 @@ choose_ucode(){
 ask_root_mountpoint(){
     echo "$GREEN""Now you should choose a partition as your root patition,""$RESET"
     if [ -d /sys/firmware/efi/efivars ];then
-        echo "$BLUE""You have boot in UEFI mode, so choose a patition in a GPT device.""$RESET"
+        echo "$BROWN""You have boot in UEFI mode, so choose a patition in a GPT device.""$RESET"
     else
-        echo "$BLUE""You have boot in BIOS mode or UEFI/CSM mode, so choose a patition in a MBR device, and make sure the partition you chosen is marked as boot.""$RESET"
+        echo "$BROWN""You have boot in BIOS mode or UEFI/CSM mode, so choose a patition in a MBR device, and make sure the partition you chosen is marked as boot.""$RESET"
     fi
     echo "$YELLOW""Type in your root partition(eg: sda1), you don't need to type in /dev/.""$RESET"
     read -p "$YELLOW""Input your root partition: ""$RESET" -r "ROOT_PARTITION"
@@ -337,16 +337,16 @@ setup_timezone(){
 
 install_grub_bios(){
     pacstrap /mnt grub os-prober
-    arch-chroot /mnt /bin/bash -c "grub-install --target=i386-pc $DEVICE"
     pacstrap /mnt mkinitcpio "$kernel_to_install" "$kernel_to_install""-headers"
+    arch-chroot /mnt /bin/bash -c "grub-install --target=i386-pc $DEVICE"
     arch-chroot /mnt /bin/bash -c "echo 'GRUB_DISABLE_OS_PROBER=false' >> /etc/default/grub"
     arch-chroot /mnt /bin/bash -c "grub-mkconfig -o /boot/grub/grub.cfg"
 }
 
 install_grub_uefi(){
     pacstrap /mnt grub efibootmgr os-prober
-    arch-chroot /mnt /bin/bash -c "grub-install --target=x86_64-efi --bootloader-id='Arch Linux' --efi-directory=$ESP"
     pacstrap /mnt mkinitcpio "$kernel_to_install" "$kernel_to_install""-headers"
+    arch-chroot /mnt /bin/bash -c "grub-install --target=x86_64-efi --bootloader-id='Arch Linux' --efi-directory=/efi"
     arch-chroot /mnt /bin/bash -c "echo 'GRUB_DISABLE_OS_PROBER=false' >> /etc/default/grub"
     arch-chroot /mnt /bin/bash -c "grub-mkconfig -o /boot/grub/grub.cfg"
 }
@@ -366,15 +366,15 @@ enable_timesync(){
 
 setup_zsh()(
     bash -c ./bin/setup-easy-zsh.sh
-    echo "$BLUE""paru has been installed as your AUR helper.""$RESET"
-    echo "$BLUE""pkgfile has been installed as your package command search tool.""$RESET"
-    echo "$BLUE""easy-zsh-config has been installed as your zsh config.""$RESET"
-    echo "$BLUE""oh-my-posh has been installed as your zsh theme.""$RESET"
-    echo "$BLUE""zsh-autosuggestions has been installed as your zsh plugin.""$RESET"
-    echo "$BLUE""zsh-syntax-highlighting has been installed as your zsh plugin.""$RESET"
-    echo "$BLUE""zsh-completions has been installed as your zsh plugin.""$RESET"
-    echo "$BLUE""zsh-history-substring-search has been installed as your zsh plugin.""$RESET"
-    echo "$BLUE""use \"paru -Syu\" to update AUR packages.""$RESET"
+    echo "$BROWN""paru has been installed as your AUR helper.""$RESET"
+    echo "$BROWN""pkgfile has been installed as your package command search tool.""$RESET"
+    echo "$BROWN""easy-zsh-config has been installed as your zsh config.""$RESET"
+    echo "$BROWN""oh-my-posh has been installed as your zsh theme.""$RESET"
+    echo "$BROWN""zsh-autosuggestions has been installed as your zsh plugin.""$RESET"
+    echo "$BROWN""zsh-syntax-highlighting has been installed as your zsh plugin.""$RESET"
+    echo "$BROWN""zsh-completions has been installed as your zsh plugin.""$RESET"
+    echo "$BROWN""zsh-history-substring-search has been installed as your zsh plugin.""$RESET"
+    echo "$BROWN""use \"paru -Syu\" to update AUR packages.""$RESET"
 )
 
 main(){

@@ -11,5 +11,10 @@ arch-chroot /mnt /bin/bash -c "systemctl enable bluetooth.service"
 cp ./customs/wayland.sh /mnt/etc/profile.d/wayland.sh
 cp ./customs/xdg-open /mnt/usr/local/bin/xdg-open
 
+mkdir -p /mnt/etc/sddm.conf.d
 echo '[General]
-DisplayServer=wayland' > /mnt/etc/sddm.conf.d/wayland.conf
+DisplayServer=wayland
+GreeterEnvironment=QT_WAYLAND_SHELL_INTEGRATION=layer-shell
+[Wayland]
+CompositorCommand=kwin_wayland --no-lockscreen --no-global-shortcuts
+' > /mnt/etc/sddm.conf.d/wayland.conf
