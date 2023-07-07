@@ -2,10 +2,10 @@
 
 install_easy_zsh(){
     arch-chroot /mnt /bin/bash -c "curl -# -LO https://github.com/MarksonHon/arch-installer/releases/download/v0.1.0/easy-zsh-config-0.6.1-1-any.pkg.tar.zst"
-    arch-chroot /mnt /bin/bash -c "pacman -U easy-zsh-config-0.6.1-1-any.pkg.tar.zst --noconfirm"
-    arch-chroot /mnt /bin/bash -c "rm easy-zsh-config-0.6.1-1-any.pkg.tar.zst"
     arch-chroot /mnt /bin/bash -c "curl -# -LO https://github.com/MarksonHon/arch-installer/releases/download/v0.1.0/oh-my-posh-bin-17.6.0-1-x86_64.pkg.tar.zst"
     arch-chroot /mnt /bin/bash -c "pacman -U oh-my-posh-bin-17.6.0-1-x86_64.pkg.tar.zst --noconfirm"
+    arch-chroot /mnt /bin/bash -c "pacman -U easy-zsh-config-0.6.1-1-any.pkg.tar.zst --noconfirm"
+    arch-chroot /mnt /bin/bash -c "rm easy-zsh-config-0.6.1-1-any.pkg.tar.zst"
     arch-chroot /mnt /bin/bash -c "rm oh-my-posh-bin-17.6.0-1-x86_64.pkg.tar.zst"
 }
 
