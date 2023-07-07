@@ -331,7 +331,7 @@ ask_timezone(){
 }
 
 setup_timezone(){
-    ln -sf /mnt/usr/share/zoneinfo/"$USER_TIMEZONE" /mnt/etc/localetime
+    arch-chroot /mnt/ /bin/bash -c "ln -sf /usr/share/zoneinfo/$USER_TIMEZONE /etc/localetime"
     arch-chroot /mnt/ /bin/bash -c "hwclock --systohc"
 }
 
