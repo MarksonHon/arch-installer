@@ -206,7 +206,7 @@ choose_kernel(){
             kernel_name="Linux Realtime Kernel"
         elif [ "$KERNEL_CHOOSEN" == '6' ];then
             kernel_to_install="linux-rt-lts"
-            kernel_name=" Linux Realtime LTS Kernel"
+            kernel_name="Linux Realtime LTS Kernel"
         else
             echo "$YELLOW""You must make a choice!""$RESET"
             kernel_name=""
@@ -358,7 +358,6 @@ install_systemd_boot(){
     mkdir -p /mnt/etc/mkinitcpio.d/
     cat "./customs/systemd-boot-uki-kernel.conf" | sed "s|linux|$kernel_to_install|g" | tee "/mnt/etc/mkinitcpio.d/""$kernel_to_install"".preset.pacsave"
     pacstrap /mnt mkinitcpio "$kernel_to_install" "$kernel_to_install""-headers"
-
 }
 
 enable_timesync(){
