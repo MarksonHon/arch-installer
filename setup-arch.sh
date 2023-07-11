@@ -257,9 +257,11 @@ install_bootloader(){
 }
 
 install_bases(){
-    pacstrap -K /mnt base base-devel linux-firmware dnsutils usbutils libva-utils "$ucode" zsh unrar p7zip unzip sudo
+    pacstrap -K /mnt base base-devel linux-firmware dnsutils usbutils libva-utils "$ucode" zsh unrar p7zip unzip sudo nano
     pacstrap /mnt libva-mesa-driver intel-media-driver libva-intel-driver vulkan-intel vulkan-radeon vulkan-mesa-layers
     genfstab -U /mnt | tee /mnt/etc/fstab
+    echo 'include "/usr/share/nano/*.nanorc"
+include "/usr/share/nano/extra/*.nanorc"' >> /mnt/etc/nanorc
 }
 
 ask_sudo_user(){
