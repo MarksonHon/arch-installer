@@ -45,12 +45,20 @@ setup_pkgfile_hook(){
     paru -S --noconfirm pacman-pkgfile-hook
 }
 
+setup_flatpak(){
+    sudo pacman -S flatpak --noconfirm
+    sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    sudo cp customs/flatpak-fonts.sh /etc/profile.d/
+}
+
 setup_paru
 setup_zsh
 setup_pkgfile_hook
 setup_fcitx5
+setup_flatpak
 [ -d ~/.config/fontconfig/ ] || mkdir -p ~/.config/fontconfig/
 [ -f ~/.config/fontconfig/fonts.conf ] || cp customs/fonts.conf ~/.config/fontconfig/
+
 
 echo "Done!"
 
