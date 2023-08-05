@@ -44,6 +44,8 @@ setup_fcitx5(){
 setup_paru
 setup_zsh
 setup_fcitx5
+[ -d ~/.config/fontconfig/ ] || mkdir -p ~/.config/fontconfig/
+[ -f ~/.config/fontconfig/fonts.conf ] || cp customs/fonts.conf ~/.config/fontconfig/
 
 echo "Done!"
 
