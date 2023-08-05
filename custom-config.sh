@@ -49,6 +49,7 @@ setup_flatpak(){
     sudo pacman -S flatpak --noconfirm
     sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
     sudo cp customs/flatpak-fonts.sh /etc/profile.d/
+    flatpak --user override --filesystem=~/.config/fontconfig:ro
 }
 
 setup_paru
