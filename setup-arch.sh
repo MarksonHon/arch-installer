@@ -366,19 +366,6 @@ enable_timesync(){
     arch-chroot /mnt /bin/bash -c "systemctl enable systemd-timesyncd.service"
 }
 
-setup_zsh()(
-    bash -c ./bin/setup-easy-zsh.sh
-    echo "$BROWN""paru has been installed as your AUR helper.""$RESET"
-    echo "$BROWN""pkgfile has been installed as your package command search tool.""$RESET"
-    echo "$BROWN""easy-zsh-config has been installed as your zsh config.""$RESET"
-    echo "$BROWN""oh-my-posh has been installed as your zsh theme.""$RESET"
-    echo "$BROWN""zsh-autosuggestions has been installed as your zsh plugin.""$RESET"
-    echo "$BROWN""zsh-syntax-highlighting has been installed as your zsh plugin.""$RESET"
-    echo "$BROWN""zsh-completions has been installed as your zsh plugin.""$RESET"
-    echo "$BROWN""zsh-history-substring-search has been installed as your zsh plugin.""$RESET"
-    echo "$BROWN""use \"paru -Syu\" to update AUR packages.""$RESET"
-)
-
 main(){
     choose_ucode
     ask_kernel
@@ -398,7 +385,6 @@ main(){
     setup_locale
     setup_timezone
     enable_timesync
-    setup_zsh
 }
 
 main "$@"
