@@ -356,11 +356,20 @@ install_grub_uefi(){
 
 install_systemd_boot(){
     arch-chroot /mnt /bin/bash -c "bootctl install --esp-path=/efi"
+    pacstrap /mnt dracut plymouth
+    [ -d /etc/dracut.conf.d ] || mkdir /etc/dracut.conf.d
     root_partition_part_uuid="$(lsblk "$ROOT_PARTITION" -no PARTUUID)"
-    echo "root=PARTUUID=$root_partition_part_uuid rw rootfstype=ext4" > /mnt/etc/kernel/cmdline
-    mkdir -p /mnt/etc/mkinitcpio.d/
-    cat "./customs/systemd-boot-uki-kernel.conf" | sed "s|linux|$kernel_to_install|g" | tee "/mnt/etc/mkinitcpio.d/""$kernel_to_install"".preset.pacsave"
-    pacstrap /mnt mkinitcpio "$kernel_to_install" "$kernel_to_install""-headers"
+    echo "kernel_cmdline=""\"root=PARTUUID=$root_partition_part_uuid rw rootfstype=ext4 splash quiet\"" > /mnt/etc/dracut.conf.d/cmdline.conf 
+    cp ./dracut/bin/dracut-install.sh /mnt/usr/local/bin/dracut-install.sh
+    cp ./dracut/bin/dracut-remove.sh /mnt/usr/local/bin/dracut-remove.sh
+    chmod +x /mnt/usr/local/bin/dracut-install.sh /mnt/usr/local/bin/dracut-remove.sh
+    mkdir /mnt/etc/pacman.d/hooks
+    cp ./dracut/hooks/dracut-install.hook /mnt/etc/pacman.d/hooks/60-dracut-install.hook
+    cp ./dracut/hooks/dracut-remove.hook /mnt/etc/pacman.d/hooks/90-dracut-remove.hook
+    pacstrap /mnt "$kernel_to_install" "$kernel_to_install""-headers"
+    [ -d /mnt/etc/plymouth/ ] || mkdir /mnt/etc/plymouth/
+    echo '[Daemon]
+Theme=bgrt' > /etc/plymouth/plymouthd.conf
 }
 
 enable_timesync(){
