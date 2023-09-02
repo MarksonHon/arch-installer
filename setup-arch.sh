@@ -359,7 +359,8 @@ install_systemd_boot(){
     pacstrap /mnt dracut plymouth
     [ -d /etc/dracut.conf.d ] || mkdir /etc/dracut.conf.d
     root_partition_part_uuid="$(lsblk "$ROOT_PARTITION" -no PARTUUID)"
-    echo "kernel_cmdline=""\"root=PARTUUID=$root_partition_part_uuid rw rootfstype=ext4 splash quiet\"" > /mnt/etc/dracut.conf.d/cmdline.conf 
+    echo "kernel_cmdline=""\"root=PARTUUID=$root_partition_part_uuid rw rootfstype=ext4 splash quiet\"" > /mnt/etc/dracut.conf.d/cmdline.conf
+    echo "compress=zstd" > /mnt/etc/dracut.conf.d/compress.conf
     cp ./dracut/bin/dracut-install.sh /mnt/usr/local/bin/dracut-install.sh
     cp ./dracut/bin/dracut-remove.sh /mnt/usr/local/bin/dracut-remove.sh
     chmod +x /mnt/usr/local/bin/dracut-install.sh /mnt/usr/local/bin/dracut-remove.sh
