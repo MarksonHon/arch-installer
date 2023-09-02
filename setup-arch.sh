@@ -366,10 +366,10 @@ install_systemd_boot(){
     mkdir /mnt/etc/pacman.d/hooks
     cp ./dracut/hooks/dracut-install.hook /mnt/etc/pacman.d/hooks/60-dracut-install.hook
     cp ./dracut/hooks/dracut-remove.hook /mnt/etc/pacman.d/hooks/90-dracut-remove.hook
-    pacstrap /mnt "$kernel_to_install" "$kernel_to_install""-headers"
     [ -d /mnt/etc/plymouth/ ] || mkdir /mnt/etc/plymouth/
     echo '[Daemon]
 Theme=bgrt' > /etc/plymouth/plymouthd.conf
+    pacstrap /mnt "$kernel_to_install" "$kernel_to_install""-headers"
 }
 
 enable_timesync(){
