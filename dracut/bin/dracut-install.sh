@@ -11,7 +11,7 @@ while read -r line; do
                 install -Dm0644 "/${line%'/pkgbase'}/vmlinuz" "/boot/vmlinuz-${pkgbase}"
                 echo "Generating unified kernel image for kernel version $kver to $ESP_PATH/EFI/Linux/arch-${pkgbase}.efi"
                 dracut "${args[@]}" --hostonly --uefi "$ESP_PATH"/EFI/Linux/arch-${pkgbase}.efi --kver "$kver" > /dev/null 2>&1
-                echo "Generating unified kernel image fallback for kernel version $kver to $ESP_PATH/EFI/Linux/arch-${pkgbase}-fallback.efi"
+                echo "Generating unified kernel fallback image for kernel version $kver to $ESP_PATH/EFI/Linux/arch-${pkgbase}-fallback.efi"
                 dracut "${args[@]}" --no-hostonly --uefi "$ESP_PATH"/EFI/Linux/arch-${pkgbase}-fallback.efi --kver "$kver" > /dev/null 2>&1
         fi
 done

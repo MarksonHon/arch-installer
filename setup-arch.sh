@@ -377,6 +377,17 @@ enable_timesync(){
     arch-chroot /mnt /bin/bash -c "systemctl enable systemd-timesyncd.service"
 }
 
+setup_fcitx5(){
+    pacstrap /mnt fcitx5-im fcitx5-chinese-addons fcitx5-pinyin-zhwiki
+    cp customs/fcitx5.sh /mnt/etc/profile.d/
+}
+
+apply_custom_fontconfig(){
+    mkdir -p /mnt/usr/local/share/fontconfig/conf.avail/
+    cp customs/fonts.conf /mnt/usr/local/share/fontconfig/conf.avail/
+    arch-chroot /mnt /bin/bash -c "ln -s /usr/local/share/fontconfig/conf.avail/fonts.conf /etc/fonts/conf.d/64-language-selector-prefer.conf"
+}
+
 main(){
     choose_ucode
     ask_kernel
@@ -396,6 +407,8 @@ main(){
     setup_locale
     setup_timezone
     enable_timesync
+    setup_fcitx5
+    apply_custom_fontconfig
 }
 
 main "$@"
