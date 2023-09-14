@@ -2,7 +2,7 @@
 
 set -e
 
-pacstrap /mnt plasma-meta kde-system okular spectacle arianna gwenview ark kate konsole kwalletmanager kweather print-manager system-config-printer cups-pk-helper yakuake plasma-wayland-session falkon pipewire-pulse pipewire-jack noto-fonts-cjk noto-fonts-emoji noto-fonts-extra noto-fonts
+pacstrap /mnt plasma kde-system okular spectacle arianna gwenview ark kate konsole kwalletmanager kweather print-manager system-config-printer cups-pk-helper yakuake plasma-wayland-session falkon pipewire-pulse pipewire-jack noto-fonts-cjk noto-fonts-emoji noto-fonts-extra noto-fonts
 
 arch-chroot /mnt /bin/bash -c "systemctl enable sddm.service"
 arch-chroot /mnt /bin/bash -c "systemctl enable NetworkManager.service"
