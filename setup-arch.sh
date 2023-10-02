@@ -357,7 +357,7 @@ install_grub_uefi(){
 install_systemd_boot(){
     arch-chroot /mnt /bin/bash -c "bootctl install --esp-path=/efi"
     pacstrap /mnt dracut plymouth
-    [ -d /etc/dracut.conf.d ] || mkdir /etc/dracut.conf.d
+    [ -d /mnt/etc/dracut.conf.d ] || mkdir /mnt/etc/dracut.conf.d
     root_partition_part_uuid="$(lsblk "$ROOT_PARTITION" -no PARTUUID)"
     echo "kernel_cmdline=""\"root=PARTUUID=$root_partition_part_uuid rw rootfstype=ext4 splash quiet\"" > /mnt/etc/dracut.conf.d/cmdline.conf
     echo "compress=zstd" > /mnt/etc/dracut.conf.d/compress.conf
@@ -367,10 +367,7 @@ install_systemd_boot(){
     mkdir /mnt/etc/pacman.d/hooks
     cp ./dracut/hooks/dracut-install.hook /mnt/etc/pacman.d/hooks/60-dracut-install.hook
     cp ./dracut/hooks/dracut-remove.hook /mnt/etc/pacman.d/hooks/90-dracut-remove.hook
-    [ -d /mnt/etc/plymouth/ ] || mkdir /mnt/etc/plymouth/
-    echo '[Daemon]
-Theme=bgrt' > /etc/plymouth/plymouthd.conf
-    pacstrap /mnt "$kernel_to_install" "$kernel_to_install""-headers"
+    pacstrap /mnt "$kernel_to_install" "$kernel_to_install"-headers
 }
 
 enable_timesync(){
@@ -384,8 +381,8 @@ setup_fcitx5(){
 
 apply_custom_fontconfig(){
     mkdir -p /mnt/usr/local/share/fontconfig/conf.avail/
-    cp customs/fonts.conf /mnt/usr/local/share/fontconfig/conf.avail/
-    arch-chroot /mnt /bin/bash -c "ln -s /usr/local/share/fontconfig/conf.avail/fonts.conf /etc/fonts/conf.d/64-language-selector-prefer.conf"
+    cp customs/fonts.conf /mnt/etc/fonts/conf.avail/64-language-selector-prefer.conf
+    arch-chroot /mnt /bin/bash -c "ln -s /etc/fonts/conf.avail/64-language-selector-prefer.conf /etc/fonts/conf.d/64-language-selector-prefer.conf"
 }
 
 main(){
