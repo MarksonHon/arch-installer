@@ -97,12 +97,12 @@ mount_mountpoints(){
         ask_grub_bios
         choose_grub_bios
     fi
-    read -p "$YELLOW""Input yes to format root if you want:""$RESET" -r "FORMAT_ROOT"
+    read -p "$YELLOW""Input yes to format root if you want: ""$RESET" -r "FORMAT_ROOT"
     if [ "$FORMAT_ROOT" == "yes" ]; then
         mkfs.ext4 "$ROOT_PARTITION"
     fi
     if [ -n "$ESP" ]; then
-        read -p "$YELLOW""Input yes to format ESP if you want:""$RESET" -r "FORMAT_ESP"
+        read -p "$YELLOW""Input yes to format ESP if you want: ""$RESET" -r "FORMAT_ESP"
         if [ "$FORMAT_ESP" == "yes" ];then
             mkfs.vfat "$ESP"
         fi
@@ -357,17 +357,18 @@ install_grub_uefi(){
 install_systemd_boot(){
     arch-chroot /mnt /bin/bash -c "bootctl install --esp-path=/efi"
     pacstrap /mnt dracut plymouth
-    [ -d /mnt/etc/dracut.conf.d ] || mkdir /mnt/etc/dracut.conf.d
+    mkdir /mnt/etc/dracut.conf.d
     root_partition_part_uuid="$(lsblk "$ROOT_PARTITION" -no PARTUUID)"
     echo "kernel_cmdline=""\"root=PARTUUID=$root_partition_part_uuid rw rootfstype=ext4 splash quiet\"" > /mnt/etc/dracut.conf.d/cmdline.conf
     echo "compress=zstd" > /mnt/etc/dracut.conf.d/compress.conf
-    cp ./dracut/bin/dracut-install.sh /mnt/usr/local/bin/dracut-install.sh
-    cp ./dracut/bin/dracut-remove.sh /mnt/usr/local/bin/dracut-remove.sh
-    chmod +x /mnt/usr/local/bin/dracut-install.sh /mnt/usr/local/bin/dracut-remove.sh
+    cp dracut/bin/dracut-install.sh /mnt/usr/local/bin/dracut-install.sh
+    cp dracut/bin/dracut-remove.sh /mnt/usr/local/bin/dracut-remove.sh
+    chmod +x /mnt/usr/local/bin/dracut-install.sh
+    chmod +x /mnt/usr/local/bin/dracut-remove.sh
     mkdir /mnt/etc/pacman.d/hooks
-    cp ./dracut/hooks/dracut-install.hook /mnt/etc/pacman.d/hooks/60-dracut-install.hook
-    cp ./dracut/hooks/dracut-remove.hook /mnt/etc/pacman.d/hooks/90-dracut-remove.hook
-    pacstrap /mnt "$kernel_to_install" "$kernel_to_install"-headers
+    cp dracut/hooks/dracut-install.hook /mnt/etc/pacman.d/hooks/60-dracut-install.hook
+    cp dracut/hooks/dracut-remove.hook /mnt/etc/pacman.d/hooks/90-dracut-remove.hook
+    arch-chroot /mnt /bin/bash -c "pacman -S $kernel_to_install $kernel_to_install-headers --noconfirm"
 }
 
 enable_timesync(){
@@ -381,8 +382,8 @@ setup_fcitx5(){
 
 apply_custom_fontconfig(){
     mkdir -p /mnt/usr/local/share/fontconfig/conf.avail/
-    cp customs/fonts.conf /mnt/etc/fonts/conf.avail/64-language-selector-prefer.conf
-    arch-chroot /mnt /bin/bash -c "ln -s /etc/fonts/conf.avail/64-language-selector-prefer.conf /etc/fonts/conf.d/64-language-selector-prefer.conf"
+    cp customs/fonts.conf /mnt/usr/local/share/fontconfig/conf.avail/64-language-selector-prefer.conf
+    arch-chroot /mnt /bin/bash -c "ln -s /usr/local/share/fontconfig/conf.avail/64-language-selector-prefer.conf /etc/fonts/conf.d/64-language-selector-prefer.conf"
 }
 
 main(){
